@@ -1,8 +1,9 @@
 # Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+#### SET THIS TO True TO TURN ON THE WORKAROUND FOR THE BUG
+_shorten_class_names = False
+
+# -- Imports -----------------------------------------------------------------
 
 import os
 import re
@@ -11,12 +12,9 @@ from sphinx.ext import apidoc
 
 # -- Path setup --------------------------------------------------------------
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
 sys.path.insert(0, os.path.abspath('.'))
-
+_output_dir = os.path.abspath(".")
+_unfiltered_files = os.path.abspath("unfiltered-files.txt")
 
 # -- Project information -----------------------------------------------------
 
@@ -24,45 +22,26 @@ project = 'Example'
 copyright = '2021, Donal Fellows'
 author = 'Donal Fellows'
 
-
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.autosummary',
+    'sphinx.ext.autodoc'
 ]
-
-# Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = 'alabaster'
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
+html_theme = 'bizstyle'
 html_static_path = ['_static']
 
-_output_dir = os.path.abspath(".")
-_unfiltered_files = os.path.abspath("unfiltered-files.txt")
-_shorten_class_names = False
+# -- Customisation code ------------------------------------------------------
 
-# Automatically called by sphinx at startup
 def setup(app):
+    """
+    Connects (if enabled) a handler that rewrites objects to have the right
+    (public) module names.
+    """
     # NB: extra dot at end is deliberate!
     trim = ("foo.", )
 
@@ -84,6 +63,9 @@ def setup(app):
         app.connect('autodoc-skip-member', skip_handler)
 
 def filtered_files(base, unfiltered_files_filename):
+    """
+    Generates the exclusions for apidoc
+    """
     with open(unfiltered_files_filename) as f:
         lines = [line.rstrip() for line in f]
     # Skip comments and empty lines to get list of files we DON'T want to
@@ -98,6 +80,8 @@ def filtered_files(base, unfiltered_files_filename):
                     print("FILTERING FILE IN __init__:", full)
                     yield full
 
+# We want to run apidoc every time; that's how the real project rolls
+# It's important when the project moves internal class structure around
 apidoc.main([
     '-q', '-o', _output_dir, "foo",
     *filtered_files("foo", _unfiltered_files)])

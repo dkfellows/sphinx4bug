@@ -13,7 +13,7 @@ help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 clean:
-	-$(RM) foo.rst foo.bar.rst modules.rst 
+	-$(RM) -rf foo.rst foo.bar.rst modules.rst _build 
 
 .PHONY: help Makefile clean
 
