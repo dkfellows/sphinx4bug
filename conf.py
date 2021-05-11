@@ -59,6 +59,7 @@ html_static_path = ['_static']
 
 _output_dir = os.path.abspath(".")
 _unfiltered_files = os.path.abspath("unfiltered-files.txt")
+_shorten_class_names = False
 
 # Automatically called by sphinx at startup
 def setup(app):
@@ -72,13 +73,15 @@ def setup(app):
             m = re.sub(r'\.[a-z0-9_]+$', '', obj.__module__)
             if any(m.startswith(prefix) for prefix in trim) and \
                     name in dir(sys.modules[m]):
+                print("SHORTENING MODULE NAME FOR", obj, "TO", m)
                 # It is, so update to say that's canonical location for
                 # documentation purposes
                 obj.__module__ = m
         return skip  # We don't care to change this
 
-    # Connect the callback to the autodoc-skip-member event from apidoc
-    app.connect('autodoc-skip-member', skip_handler)
+    if _shorten_class_names:
+        # Connect the callback to the autodoc-skip-member event from apidoc
+        app.connect('autodoc-skip-member', skip_handler)
 
 def filtered_files(base, unfiltered_files_filename):
     with open(unfiltered_files_filename) as f:
@@ -92,6 +95,7 @@ def filtered_files(base, unfiltered_files_filename):
             if filename.endswith(".py") and not filename.startswith("_"):
                 full = root + "/" + filename
                 if full not in unfiltered:
+                    print("FILTERING FILE IN __init__:", full)
                     yield full
 
 apidoc.main([
