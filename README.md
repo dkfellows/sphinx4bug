@@ -1,5 +1,5 @@
 # sphinx4bug
-Demonstrating a failure with Sphinx 4
+Demonstrating a failure with Sphinx 4 (for https://github.com/sphinx-doc/sphinx/issues/9211)
 
 To show the problem, install Sphinx 4.0.0 in your current Python (virtual) environment and run:
 
