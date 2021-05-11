@@ -62,26 +62,6 @@ def setup(app):
         # Connect the callback to the autodoc-skip-member event from apidoc
         app.connect('autodoc-skip-member', skip_handler)
 
-def filtered_files(base, unfiltered_files_filename):
-    """
-    Generates the exclusions for apidoc
-    """
-    with open(unfiltered_files_filename) as f:
-        lines = [line.rstrip() for line in f]
-    # Skip comments and empty lines to get list of files we DON'T want to
-    # filter out; this is definitely complicated
-    unfiltered = set(
-        line for line in lines if not line.startswith("#") and line != "")
-    for root, _dirs, files in os.walk(base):
-        for filename in files:
-            if filename.endswith(".py") and not filename.startswith("_"):
-                full = root + "/" + filename
-                if full not in unfiltered:
-                    print("FILTERING FILE IN __init__:", full)
-                    yield full
-
 # We want to run apidoc every time; that's how the real project rolls
 # It's important when the project moves internal class structure around
-apidoc.main([
-    '-q', '-o', _output_dir, "foo",
-    *filtered_files("foo", _unfiltered_files)])
+apidoc.main(['-q', '-o', _output_dir, "foo", 'foo/bar/grill.py'])
